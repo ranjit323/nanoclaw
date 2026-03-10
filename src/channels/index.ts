@@ -9,5 +9,8 @@
 
 // telegram
 
+// web
+import './web.js';
+
 // whatsapp
 import './whatsapp.js';

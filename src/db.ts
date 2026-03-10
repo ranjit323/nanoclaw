@@ -363,6 +363,32 @@ export function getMessagesSince(
     .all(chatJid, sinceTimestamp, `${botPrefix}:%`, limit) as NewMessage[];
 }
 
+/**
+ * Get all messages for a chat, including bot messages. Used by the web UI history panel.
+ */
+export interface RawMessage {
+  id: string;
+  chat_jid: string;
+  sender: string;
+  sender_name: string;
+  content: string;
+  timestamp: string;
+  is_from_me: number;
+  is_bot_message: number;
+}
+
+export function getAllMessagesForChat(chatJid: string, limit: number = 500): RawMessage[] {
+  return db
+    .prepare(
+      `SELECT id, chat_jid, sender, sender_name, content, timestamp, is_from_me, is_bot_message
+       FROM messages
+       WHERE chat_jid = ? AND content != '' AND content IS NOT NULL
+       ORDER BY timestamp
+       LIMIT ?`,
+    )
+    .all(chatJid, limit) as RawMessage[];
+}
+
 export function createTask(
   task: Omit<ScheduledTask, 'last_run' | 'last_result'>,
 ): void {
